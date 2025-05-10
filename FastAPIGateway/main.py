@@ -14,7 +14,7 @@ ALGORITHM = "HS256"
 # Routes for services based on path prefixes
 SERVICE_ROUTES = {
     "/api/": "http://django-service:8000",
-    "/user/": "http://user-service:8000"
+    "/user/": "http://127.0.0.1:8000"
 }
 
 # CORS Middleware (adjust for production)
@@ -46,8 +46,12 @@ def get_target_service(path: str):
 # Main proxy route
 @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
 async def proxy(request: Request, path: str):
-    # Skip auth for login or registration if needed
-    if path in ["auth/login", "auth/register"]:
+    # Allow unauthenticated paths (delegated to auth-service)
+    unauthenticated_paths = [
+        "api/v1/register/", "api/v1/login/",
+        "api/v1/password/reset/", "api/v1/password/reset-confirm"
+    ]
+    if any(path.startswith(p) for p in unauthenticated_paths):
         return await forward_unauthenticated(request, path)
 
     # Validate JWT from Authorization header
@@ -81,9 +85,9 @@ async def proxy(request: Request, path: str):
 
         return JSONResponse(content=resp.json(), status_code=resp.status_code)
 
-# Publicly accessible routes like login/signup
+# Forward requests that do not require authentication (e.g. login, registration)
 async def forward_unauthenticated(request: Request, path: str):
-    auth_service_url = "http://auth-service:8000"
+    auth_service_url = "http://127.0.0.1:8000/"  # user-service handles auth endpoints
     async with httpx.AsyncClient() as client:
         body = await request.body()
         headers = dict(request.headers)
