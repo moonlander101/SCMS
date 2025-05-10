@@ -7,3 +7,6 @@
 [submodule "warehouse_management_service"]
 	path = warehouse_management_service
 	url = https://github.com/IASSCMS/Warehouse-Management-Services.git
+[submodule "forecasting_service"]
+	path = forecasting_service
+	url = https://github.com/IASSCMS/Forecasting-Service.git
