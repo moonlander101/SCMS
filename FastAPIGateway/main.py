@@ -8,13 +8,13 @@ import os
 app = FastAPI()
 
 # Configs (set these in .env or docker-compose)
-JWT_SECRET = os.getenv("JWT_SECRET", "supersecret")
+JWT_SECRET = os.getenv("JWT_SECRET", "django-insecure-o@sx!a5==cevdjqe#=&hmo#rq)@(rw!^93vg0=0x07n@+rb2bq")
 ALGORITHM = "HS256"
 
 # Routes for services based on path prefixes
 SERVICE_ROUTES = {
-    "/api/": "http://django-service:8000",
-    "/user/": "http://127.0.0.1:8000"
+    "/api/": "http://127.0.0.1:8002",      # logistics (Django) service
+    "/user/": "http://127.0.0.1:8001"     # user-service (auth)
 }
 
 # CORS Middleware (adjust for production)
@@ -87,7 +87,7 @@ async def proxy(request: Request, path: str):
 
 # Forward requests that do not require authentication (e.g. login, registration)
 async def forward_unauthenticated(request: Request, path: str):
-    auth_service_url = "http://127.0.0.1:8000/"  # user-service handles auth endpoints
+    auth_service_url = "http://127.0.0.1:8001"  # user-service handles auth endpoints
     async with httpx.AsyncClient() as client:
         body = await request.body()
         headers = dict(request.headers)
