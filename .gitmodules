@@ -1,0 +1,6 @@
+[submodule "user_service"]
+	path = user_service
+	url = https://github.com/IASSCMS/User-Services.git
+[submodule "logistics_service"]
+	path = logistics_service
+	url = https://github.com/IASSCMS/Logistics.git
