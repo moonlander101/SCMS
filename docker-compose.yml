@@ -1,0 +1,96 @@
+version: "3.9"
+
+services:
+  # Database
+  db:
+    image: postgres:17
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "15432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # User Authentication Service
+  user_service:
+    build:
+      context: ./user_service
+      dockerfile: Dockerfile
+    container_name: user_service
+    env_file:
+      - ./user_service/.env
+    volumes:
+      - ./user_service:/app
+    ports:
+      - "8001:8000"
+    depends_on:
+      - db
+
+  # Adminer UI for DB
+  adminer:
+    image: adminer
+    container_name: adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  # Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+
+  # Logistics Service
+  logistics_service:
+    build:
+      context: ./logistics_service
+      dockerfile: Dockerfile
+    container_name: logistics-service
+    ports:
+      - "8002:8000"
+    environment:
+      - DJANGO_PORT=8000
+      - KAFKA_BROKER_URL=kafka:9092
+    env_file:
+      - ./logistics_service/.env
+    depends_on:
+      - kafka
+
+  # FastAPI API Gateway
+  api_gateway:
+    build:
+      context: ./FastAPIGateway
+      dockerfile: Dockerfile
+    container_name: fastapi-gateway
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./FastAPIGateway/.env
+    volumes:
+      - ./FastAPIGateway:/app
+    depends_on:
+      - user_service
+      - logistics_service
+
+volumes:
+  pgdata:

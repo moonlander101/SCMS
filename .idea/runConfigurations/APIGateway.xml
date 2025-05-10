@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="APIGateway" type="Python.FastAPI" activateToolWindowBeforeRun="false">
-    <option name="additionalOptions" value="--port 8001" />
-    <option name="file" value="$PROJECT_DIR$/FastAPIGateway/main.py" />
+    <option name="additionalOptions" value="--port 8000" />
+    <option name="file" value="$PROJECT_DIR$/FastAPIGateway/gateway.py" />
     <module name="SCMS" />
     <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
