@@ -18,7 +18,7 @@ ALGORITHM = "HS256"
 # Key = public first segment
 # Value = (target_base_url, internal_path_prefix)
 SERVICE_ROUTES = {
-    "auth": (os.getenv("AUTH_SERVICE_URL", "http://localhost:8001"), "/api/v1/"),
+    "auth": (os.getenv("AUTH_SERVICE_URL", "http://localhost:8001"), "/api/v1"),
     "fleet": (os.getenv("FLEET_SERVICE_URL", "http://localhost:8002"), "/api/fleet"),
     "shipments": (os.getenv("SHIPMENTS_SERVICE_URL", "http://localhost:8002"), "/api/shipments"),
     "assignments": (os.getenv("ASSIGNMENTS_SERVICE_URL", "http://localhost:8003"), "/api/assignments"),
@@ -61,7 +61,7 @@ def get_target_service(path: str):
 @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
 async def proxy(request: Request, path: str):
     normalized_path = "/" + path
-
+    print(f"\n🔵 Incoming Request Path: {normalized_path}")
     # Handle CORS preflight
     if request.method == "OPTIONS":
         return JSONResponse(content={"message": "OK"}, status_code=200)
@@ -73,9 +73,11 @@ async def proxy(request: Request, path: str):
         "/api/v1/password/reset/",
         "/api/v1/password/reset-confirm/",
         "/api/v1/token/refresh/",
-        "/api/v1/token/verify/",
+        "/api/v1/token/verify/"
+        "/api/v1/swagger/",
     ]
     if any(normalized_path.startswith(p) for p in unauthenticated_paths):
+        print("🔓 Unauthenticated path - forwarding without auth check")  # <-- added
         return await forward_unauthenticated(request, normalized_path)
 
     # Auth required
@@ -90,13 +92,16 @@ async def proxy(request: Request, path: str):
     if not target_url:
         raise HTTPException(status_code=404, detail="No matching service route")
 
+    # Log the forwarding destination
+    full_target = f"{target_url}{rewritten_path}"
+    print(f"➡️ Forwarding to: {full_target}")
+
     async with httpx.AsyncClient() as client:
         body = await request.body()
         headers = dict(request.headers)
         headers["X-User-ID"] = str(claims.get("sub"))
         headers["X-User-Role"] = claims.get("role", "")
-        headers.pop("host", None)
-        headers.pop("authorization", None)
+
 
         resp = await client.request(
             method=request.method,
@@ -118,7 +123,8 @@ async def forward_unauthenticated(request: Request, path: str):
     async with httpx.AsyncClient() as client:
         body = await request.body()
         headers = dict(request.headers)
-        headers.pop("host", None)
+        host = request.headers.get("host", "")
+        headers["host"] = host.split(":")[0]  # Keep only domain part
 
         resp = await client.request(
             method=request.method,
