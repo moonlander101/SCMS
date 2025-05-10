@@ -10,3 +10,6 @@
 [submodule "forecasting_service"]
 	path = forecasting_service
 	url = https://github.com/IASSCMS/Forecasting-Service.git
+[submodule "order_service"]
+	path = order_service
+	url = https://github.com/IASSCMS/Order-Tracking-BlockTrack.git

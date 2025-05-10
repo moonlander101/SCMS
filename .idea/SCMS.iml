@@ -7,6 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/logistics_service" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/warehouse_management_service" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/forecasting_service" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/order_service" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/FastAPIGateway/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/user_service/.venv" />
