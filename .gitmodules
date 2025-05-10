@@ -4,3 +4,15 @@
 [submodule "logistics_service"]
 	path = logistics_service
 	url = https://github.com/IASSCMS/Logistics.git
+[submodule "warehouse_management_service"]
+	path = warehouse_management_service
+	url = https://github.com/IASSCMS/Warehouse-Management-Services.git
+[submodule "forecasting_service"]
+	path = forecasting_service
+	url = https://github.com/IASSCMS/Forecasting-Service.git
+[submodule "order_service"]
+	path = order_service
+	url = https://github.com/IASSCMS/Order-Tracking-BlockTrack.git
+[submodule "supplier_ranking_service"]
+	path = supplier_ranking_service
+	url = https://github.com/IASSCMS/supplier-ranking-service.git
