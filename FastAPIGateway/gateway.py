@@ -73,7 +73,7 @@ async def proxy(request: Request, path: str):
         "/api/v1/password/reset/",
         "/api/v1/password/reset-confirm/",
         "/api/v1/token/refresh/",
-        "/api/v1/token/verify/"
+        "/api/v1/token/verify/",
         "/api/v1/swagger/",
     ]
     if any(normalized_path.startswith(p) for p in unauthenticated_paths):
