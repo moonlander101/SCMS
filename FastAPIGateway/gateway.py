@@ -151,7 +151,7 @@ async def proxy(request: Request, path: str):
     full_target = f"{target_url}{rewritten_path}"
     logger.info(f"Forwarding to: {full_target}")
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=120.0) as client:
         body = await request.body()
         headers = dict(request.headers)
         headers["X-User-ID"] = str(claims.get("sub"))

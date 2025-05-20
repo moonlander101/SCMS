@@ -1,0 +1,462 @@
+swagger: '2.0'
+info:
+  title: SCMS API
+  description: API documentation for the SCMS project
+  termsOfService: https://www.example.com/terms/
+  contact:
+    email: test@email.com
+  license:
+    name: BSD License
+  version: v1
+host: localhost:8003
+schemes:
+  - http
+basePath: /api/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  Basic:
+    type: basic
+security:
+  - Basic: []
+paths:
+  /admin/users/:
+    get:
+      operationId: admin_users_list
+      description: Admin endpoint to get all users
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - admin
+    parameters: []
+  /admin/users/{user_id}/:
+    put:
+      operationId: admin_users_update
+      description: Admin endpoint to update user
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - admin
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        type: string
+  /admin/users/{user_id}/delete/:
+    delete:
+      operationId: admin_users_delete_delete
+      description: Admin endpoint to delete user
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - admin
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        type: string
+  /drivers/:
+    get:
+      operationId: drivers_list
+      description: |-
+        Get all drivers with their vehicle IDs, usernames, and user IDs
+        Only accessible to authenticated users (may want to restrict further based on role)
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - drivers
+    parameters: []
+  /login/:
+    post:
+      operationId: login_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - login
+    parameters: []
+  /logout/:
+    post:
+      operationId: logout_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - logout
+    parameters: []
+  /me/:
+    get:
+      operationId: me_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - me
+    parameters: []
+  /me/update/:
+    put:
+      operationId: me_update_update
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - me
+    parameters: []
+  /password/change/:
+    post:
+      operationId: password_change_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - password
+    parameters: []
+  /password/reset-confirm/{uidb64}/{token}/:
+    post:
+      operationId: password_reset-confirm_create
+      description: Handle the password reset confirmation
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - password
+    parameters:
+      - name: uidb64
+        in: path
+        required: true
+        type: string
+      - name: token
+        in: path
+        required: true
+        type: string
+  /password/reset/:
+    post:
+      operationId: password_reset_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - password
+    parameters: []
+  /register/:
+    post:
+      operationId: register_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - register
+    parameters: []
+  /register/supplier/:
+    post:
+      operationId: register_supplier_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - register
+    parameters: []
+  /register/vendor/:
+    post:
+      operationId: register_vendor_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - register
+    parameters: []
+  /suppliers/:
+    get:
+      operationId: suppliers_list
+      description: API endpoints for managing suppliers
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Supplier'
+      tags:
+        - suppliers
+    post:
+      operationId: suppliers_create
+      description: Create a new supplier
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Supplier'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/Supplier'
+      tags:
+        - suppliers
+    parameters: []
+  /suppliers/count/:
+    get:
+      operationId: suppliers_count
+      description: Get the count of suppliers, filtered by active status if specified
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Supplier'
+      tags:
+        - suppliers
+    parameters: []
+  /suppliers/{user}/:
+    get:
+      operationId: suppliers_read
+      description: API endpoints for managing suppliers
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Supplier'
+      tags:
+        - suppliers
+    put:
+      operationId: suppliers_update
+      description: Update an existing supplier
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Supplier'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Supplier'
+      tags:
+        - suppliers
+    patch:
+      operationId: suppliers_partial_update
+      description: API endpoints for managing suppliers
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Supplier'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Supplier'
+      tags:
+        - suppliers
+    delete:
+      operationId: suppliers_delete
+      description: Delete a supplier
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - suppliers
+    parameters:
+      - name: user
+        in: path
+        required: true
+        type: string
+  /suppliers/{user}/info/:
+    get:
+      operationId: suppliers_info
+      description: Get detailed information about a supplier including compliance score
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/SupplierDetail'
+      tags:
+        - suppliers
+    parameters:
+      - name: user
+        in: path
+        required: true
+        type: string
+definitions:
+  User:
+    required:
+      - username
+      - email
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      username:
+        title: Username
+        description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+        type: string
+        pattern: ^[\w.@+-]+$
+        maxLength: 150
+        minLength: 1
+      email:
+        title: Email
+        type: string
+        format: email
+        maxLength: 254
+        minLength: 1
+      first_name:
+        title: First name
+        type: string
+        maxLength: 150
+      last_name:
+        title: Last name
+        type: string
+        maxLength: 150
+      is_active:
+        title: Active
+        description: Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
+        type: boolean
+  Supplier:
+    required:
+      - company_name
+      - business_type
+      - tax_id
+      - username
+      - email
+    type: object
+    properties:
+      user:
+        $ref: '#/definitions/User'
+      company_name:
+        title: Company name
+        type: string
+        maxLength: 255
+        minLength: 1
+      code:
+        title: Code
+        type: string
+        maxLength: 10
+        minLength: 1
+      business_type:
+        title: Business type
+        type: string
+        maxLength: 100
+        minLength: 1
+      tax_id:
+        title: Tax id
+        type: string
+        maxLength: 50
+        minLength: 1
+      compliance_score:
+        title: Compliance score
+        type: number
+      active:
+        title: Active
+        type: boolean
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      username:
+        title: Username
+        type: string
+        minLength: 1
+      email:
+        title: Email
+        type: string
+        format: email
+        minLength: 1
+      first_name:
+        title: First name
+        type: string
+        minLength: 1
+      last_name:
+        title: Last name
+        type: string
+        minLength: 1
+  SupplierDetail:
+    required:
+      - company_name
+      - business_type
+      - tax_id
+    type: object
+    properties:
+      user:
+        $ref: '#/definitions/User'
+      company_name:
+        title: Company name
+        type: string
+        maxLength: 255
+        minLength: 1
+      code:
+        title: Code
+        type: string
+        maxLength: 10
+        minLength: 1
+      business_type:
+        title: Business type
+        type: string
+        maxLength: 100
+        minLength: 1
+      tax_id:
+        title: Tax id
+        type: string
+        maxLength: 50
+        minLength: 1
+      compliance_score:
+        title: Compliance score
+        type: number
+      active:
+        title: Active
+        type: boolean
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
