@@ -28,8 +28,8 @@ ALGORITHM = "HS256"
 # Key = public first segment
 # Value = (target_base_url, internal_path_prefix)
 SERVICE_ROUTES = {
-    "auth": (os.getenv("AUTH_SERVICE_URL", "http://localhost:8003"), "/api/v1", [2]),
-    "admin": (os.getenv("AUTH_SERVICE_URL", "http://localhost:8003"), "/api/v1/admin", [2]),
+    # "auth": (os.getenv("AUTH_SERVICE_URL", "http://localhost:8003"), "/api/v1", [2]),
+    "admin": (os.getenv("AUTH_SERVICE_URL", "http://localhost:8003"), "/api/v1/admin", [1]),
     "me": (os.getenv("AUTH_SERVICE_URL", "http://localhost:8003"), "/api/v1/me", [2]),
     "login": (os.getenv("AUTH_SERVICE_URL", "http://localhost:8003"), "/api/v1/login", [2]),
     "logout": (os.getenv("AUTH_SERVICE_URL", "http://localhost:8003"), "/api/v1/logout", [2]),
@@ -46,12 +46,12 @@ SERVICE_ROUTES = {
     "orders": (os.getenv("ORDER_SERVICE_URL", "http://localhost:8000"), "/api/v0/orders", [2]),
     "supplier-request": (os.getenv("ORDER_SERVICE_URL", "http://localhost:8000"), "/api/v0/supplier-request", [2]),
 
-    "warehouse": (os.getenv("WAREHOUSE_SERVICE_URL", "http://localhost:8001"), "/api/warehouse", [1]),
+    "warehouse": (os.getenv("WAREHOUSE_SERVICE_URL", "http://localhost:8001"), "/api/warehouse", [2]),
     "product": (os.getenv("WAREHOUSE_SERVICE_URL", "http://localhost:8001"), "/api/product", [2]),
 
-    "forecast": (os.getenv("FORECAST_SERVICE_URL", "http://localhost:8005"), "/api/forecast", [2]),
+    "forecast": (os.getenv("FORECAST_SERVICE_URL", "http://localhost:8005"), "/api/forecast", [1]),
 
-    "ranking": (os.getenv("RANKING_SERVICE_URL", "http://localhost:8004"), "/api/ranking", [2]),
+    "ranking": (os.getenv("RANKING_SERVICE_URL", "http://localhost:8004"), "/api/ranking", [1]),
 }
 
 
@@ -129,7 +129,7 @@ async def proxy(request: Request, path: str):
         "/api/v1/token/verify/",
         "/api/v1/swagger/",
         "/api/v1/product/products/",
-        "/api/v1/product/catagories/"
+        "/api/v1/product/categories/"
     ]
     
     target_url, rewritten_path, allowed_roles = get_target_service(normalized_path)
@@ -158,12 +158,14 @@ async def proxy(request: Request, path: str):
         if not is_authorized:
             raise HTTPException(status_code=401, detail="Unauthorized service request.")
 
-    async with httpx.AsyncClient(timeout=120.0) as client:
+    async with httpx.AsyncClient(timeout=600.0) as client:
         body = await request.body()
         headers = dict(request.headers)
         headers["X-User-ID"] = str(claims.get("sub"))
         headers["X-User-Role"] = claims.get("role", "")
 
+        if rewritten_path[-1] != "/":
+            rewritten_path = rewritten_path + "/"
 
         resp = await client.request(
             method=request.method,
