@@ -1,0 +1,18 @@
+services:
+  api_gateway:
+    build:
+      context: ./FastAPIGateway
+      dockerfile: ./FastAPIGateway/Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8006:8000"
+    env_file:
+      - ./FastAPIGateway/.env
+    volumes:
+      - ./FastAPIGateway:/app
+    networks:
+      - scms
+networks:
+  scms:
+    name: scms-network
+    external: true
