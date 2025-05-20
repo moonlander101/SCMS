@@ -34,6 +34,9 @@ SERVICE_ROUTES = {
     "login": (os.getenv("AUTH_SERVICE_URL", "http://localhost:8003"), "/api/v1/login", [2]),
     "logout": (os.getenv("AUTH_SERVICE_URL", "http://localhost:8003"), "/api/v1/logout", [2]),
     "register": (os.getenv("AUTH_SERVICE_URL", "http://localhost:8003"), "/api/v1/register", [2]),
+    "suppliers": (os.getenv("AUTH_SERVICE_URL", "http://localhost:8003"), "/api/v1/suppliers", [2]),
+    "drivers": (os.getenv("AUTH_SERVICE_URL", "http://localhost:8003"), "/api/v1/drivers", [2]),
+    
 
     "fleet": (os.getenv("LOGISTICS_SERVICE_URL", "http://localhost:8002"), "/api/fleet", [2]),
     "shipments": (os.getenv("LOGISTICS_SERVICE_URL", "http://localhost:8002"), "/api/shipments", [2]),
@@ -43,10 +46,11 @@ SERVICE_ROUTES = {
     "orders": (os.getenv("ORDER_SERVICE_URL", "http://localhost:8000"), "/api/v0/orders", [2]),
     "supplier-request": (os.getenv("ORDER_SERVICE_URL", "http://localhost:8000"), "/api/v0/supplier-request", [2]),
 
-    "warehouse": (os.getenv("WAREHOUSE_SERVICE_URL", "http://localhost:8001"), "/api/warehouse", [2]),
+    "warehouse": (os.getenv("WAREHOUSE_SERVICE_URL", "http://localhost:8001"), "/api/warehouse", [1]),
     "product": (os.getenv("WAREHOUSE_SERVICE_URL", "http://localhost:8001"), "/api/product", [2]),
 
     "forecast": (os.getenv("FORECAST_SERVICE_URL", "http://localhost:8005"), "/api/forecast", [2]),
+
     "ranking": (os.getenv("RANKING_SERVICE_URL", "http://localhost:8004"), "/api/ranking", [2]),
 }
 
@@ -124,30 +128,35 @@ async def proxy(request: Request, path: str):
         "/api/v1/token/refresh/",
         "/api/v1/token/verify/",
         "/api/v1/swagger/",
+        "/api/v1/product/products/",
+        "/api/v1/product/catagories/"
     ]
-    if any(normalized_path.startswith(p) for p in unauthenticated_paths):
-        logger.info("Unauthenticated path - forwarding without auth check")
-        return await forward_unauthenticated(request, normalized_path)
-
-    # Auth required
-    auth_header = request.headers.get("Authorization")
-    if not auth_header or not auth_header.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Authorization header missing or invalid")
-
-    token = auth_header[7:]
-    claims = decode_token(token)
-
+    
     target_url, rewritten_path, allowed_roles = get_target_service(normalized_path)
     if not target_url:
         raise HTTPException(status_code=404, detail="No matching service route")
-
-    is_authorized = check_if_authorized(token, allowed_roles)
-    if not is_authorized:
-        raise HTTPException(status_code=401, detail="Unauthorized service request.")
-
+    
     # Log the forwarding destination
     full_target = f"{target_url}{rewritten_path}"
     logger.info(f"Forwarding to: {full_target}")
+    claims = {}
+
+    if any(normalized_path.startswith(p) for p in unauthenticated_paths):
+        logger.info("Unauthenticated path - forwarding without auth check")
+        # return await forward_unauthenticated(request, normalized_path)
+
+    # Auth required
+    elif (2 not in allowed_roles):
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            raise HTTPException(status_code=401, detail="Authorization header missing or invalid")
+
+        token = auth_header[7:]
+        claims = decode_token(token)
+
+        is_authorized = check_if_authorized(token, allowed_roles)
+        if not is_authorized:
+            raise HTTPException(status_code=401, detail="Unauthorized service request.")
 
     async with httpx.AsyncClient(timeout=120.0) as client:
         body = await request.body()
