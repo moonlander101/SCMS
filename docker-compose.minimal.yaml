@@ -2,7 +2,7 @@ services:
   api_gateway:
     build:
       context: ./FastAPIGateway
-      dockerfile: ./FastAPIGateway/Dockerfile
+      dockerfile: Dockerfile
     container_name: api-gateway
     ports:
       - "8006:8000"

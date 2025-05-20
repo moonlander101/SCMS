@@ -46,7 +46,7 @@ SERVICE_ROUTES = {
     "warehouse": (os.getenv("WAREHOUSE_SERVICE_URL", "http://localhost:8001"), "/api/warehouse", [2]),
     "product": (os.getenv("WAREHOUSE_SERVICE_URL", "http://localhost:8001"), "/api/product", [2]),
 
-    "forecast": (os.getenv("FORECAST_SERVICE_URL", "http://localhost:8005"), "/api/forcast", [2]),
+    "forecast": (os.getenv("FORECAST_SERVICE_URL", "http://localhost:8005"), "/api/forecast", [2]),
     "ranking": (os.getenv("RANKING_SERVICE_URL", "http://localhost:8004"), "/api/ranking", [2]),
 }
 
@@ -138,8 +138,6 @@ async def proxy(request: Request, path: str):
     claims = decode_token(token)
 
     target_url, rewritten_path, allowed_roles = get_target_service(normalized_path)
-    # logger.debug(f"Target Service URL: {target_url}, Rewritten Path: {rewritten_path}")
-    # return f"🔍 Target Service URL: {target_url}, Rewritten Path: {rewritten_path}, Accessible? {check_if_authorized(token, allowed_roles)}"
     if not target_url:
         raise HTTPException(status_code=404, detail="No matching service route")
 
